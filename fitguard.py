@@ -23,10 +23,6 @@ st.markdown("""
         font-weight: bold;
         color: #0E2F56;
     }
-    .sub-header {
-        font-size: 16px;
-        color: #555555;
-    }
     .metric-card {
         background-color: #f8f9fa;
         border-left: 5px solid #0056b3;
@@ -43,24 +39,22 @@ st.markdown("""
 def generate_feedstock_data():
     """Generates realistic daily feedstock supply data with seasonal variations."""
     np.random.seed(42)
-    dates = pd.date_range(start="2024-01-01", periods=365, freq="D")
+    dates = pd.date_range(start="2025-01-01", periods=365, freq="D")
     base_supply = 1000  # ton/hari
-    # Musim hujan (Jan-Mar, Nov-Dec) menurunkan kualitas/penerimaan sampah
     seasonality = np.sin(np.linspace(0, 2 * np.pi, 365)) * 150
     noise = np.random.normal(0, 80, 365)
     
-    # Skenario ekstrim: Banjir di TPA (musim hujan)
+    # Skenario ekstrim: Cuaca/Banjir TPA
     extreme_events = np.zeros(365)
-    extreme_events[40:48] = -350 # Musim hujan ekstrem di Februari
-    extreme_events[300:305] = -400 # Penutupan jalan TPA sementara
+    extreme_events[40:48] = -350 
+    extreme_events[300:305] = -400 
 
     volume = base_supply + seasonality + noise + extreme_events
-    volume = np.clip(volume, 300, 1500) # Batas realistis
+    volume = np.clip(volume, 300, 1500) 
     
     df = pd.DataFrame({"Tanggal": dates, "Volume_Ton": volume})
     return df
 
-# Initialize Session State
 if "selected_modules" not in st.session_state:
     st.session_state.selected_modules = ["FeedGuard (Feedstock & Supply)", "Operational Shield"]
 
@@ -85,9 +79,6 @@ menu = st.sidebar.radio(
     ]
 )
 
-st.sidebar.markdown("---")
-st.sidebar.info("💡 **Tips Presentasi:** Gunakan alur navigasi dari atas ke bawah untuk menyampaikan argumen yang koheren kepada Juri Final.")
-
 # ==========================================
 # 4. HALAMAN DASHBOARD
 # ==========================================
@@ -97,12 +88,12 @@ st.sidebar.info("💡 **Tips Presentasi:** Gunakan alur navigasi dari atas ke ba
 # ------------------------------------------
 if menu == "1. Executive Summary":
     st.title("🛡️ Tugu CircularShield 360")
-    st.markdown("##### *End-to-End Parametric & Holistic Insurance for Waste-to-Energy (WtE) Ecosystem in Indonesia*[cite: 1]")
+    st.markdown("##### *End-to-End Parametric & Holistic Insurance for Waste-to-Energy (WtE) Ecosystem in Indonesia*")
     st.markdown("---")
     
     st.markdown("### Executive Overview")
     st.write("""
-    Proyek Waste-to-Energy (WtE) memiliki risiko kompleksitas tinggi yang mencakup 5 fase utama. Solusi asuransi eksisting saat ini masih **parsial** (sebatas CAR, PAR, dan MB)[cite: 1]. **Tugu CircularShield 360** hadir sebagai jawaban holistik dengan unggulan **FeedGuard** — produk *Parametric Insurance* berbasis data real-time untuk mitigasi risiko pasokan sampah[cite: 1].
+    Proyek Waste-to-Energy (WtE) memiliki risiko kompleksitas tinggi yang mencakup 5 fase utama. Solusi asuransi eksisting saat ini masih **parsial** (sebatas CAR, PAR, dan MB). **Tugu CircularShield 360** hadir sebagai jawaban holistik dengan unggulan **FeedGuard** — produk *Parametric Insurance* berbasis data real-time untuk mitigasi risiko pasokan sampah.
     """)
     
     col1, col2, col3, col4 = st.columns(4)
@@ -119,11 +110,26 @@ if menu == "1. Executive Summary":
     st.subheader("Pendekatan Strategis: PREDICT → ASSESS → PREVENT → PROTECT → ENABLE")
     
     c1, c2, c3, c4, c5 = st.columns(5)
-    c1.info("**PREDICT**\n\nAI Forecasting pasokan feedstock & emisi.")
-    c2.warning("**ASSESS**\n\nRisk Scoring otomatis 5 fase proyek WtE.")
-    c3.success("**PREVENT**\n\nEarly warning system saat pasokan kritis.")
-    c4.error("**PROTECT**\n\nKlaim parametrik otomatis tanpa perselisihan.")
-    c5.primary("**ENABLE**\n\nMeningkatkan Bankability & ESG rating.")
+    with c1:
+        with st.container(border=True):
+            st.markdown("**PREDICT**")
+            st.caption("AI Forecasting pasokan feedstock & emisi.")
+    with c2:
+        with st.container(border=True):
+            st.markdown("**ASSESS**")
+            st.caption("Risk Scoring otomatis 5 fase proyek WtE.")
+    with c3:
+        with st.container(border=True):
+            st.markdown("**PREVENT**")
+            st.caption("Early warning system saat pasokan kritis.")
+    with c4:
+        with st.container(border=True):
+            st.markdown("**PROTECT**")
+            st.caption("Klaim parametrik otomatis tanpa perselisihan.")
+    with c5:
+        with st.container(border=True):
+            st.markdown("**ENABLE**")
+            st.caption("Meningkatkan Bankability & ESG rating.")
 
     st.markdown("---")
     st.subheader("Perbandingan: Asuransi Eksisting vs Tugu CircularShield 360")
@@ -139,30 +145,40 @@ if menu == "1. Executive Summary":
 # ------------------------------------------
 elif menu == "2. Risk Mapping Ecosystem":
     st.title("🗺️ Pemetaan Risiko Ekosistem Waste-to-Energy")
-    st.markdown("Visualisasi kompleksitas risiko sepanjang siklus rantai nilai WtE di Indonesia.[cite: 1]")
+    st.markdown("Visualisasi kompleksitas risiko sepanjang siklus rantai nilai WtE di Indonesia.")
     st.markdown("---")
     
-    # Sankey Diagram Flow
     st.subheader("Alur Rantai Nilai & Paparan Risiko WtE")
+    
+    # Sankey diagram dengan kontras visual memadai
     fig_sankey = go.Figure(data=[go.Sankey(
-        node = dict(
-          pad = 15,
-          thickness = 20,
-          line = dict(color = "black", width = 0.5),
-          label = ["Pengumpulan Sampah", "Konstruksi Fasilitas", "Operasional Pembangkit", "Offtake Listrik PLN", "Kredit Karbon", 
-                   "Risiko Pasokan", "Risiko Keterlambatan EPC", "Risiko Kerusakan Mesin", "Risiko Penalti Grid", "Risiko Volatilitas Harga Karbon"],
-          color = "#0056b3"
+        node=dict(
+          pad=20,
+          thickness=20,
+          line=dict(color="black", width=0.5),
+          label=[
+              "1. Pengumpulan Sampah", "2. Konstruksi Fasilitas", "3. Operasional Pembangkit", "4. Offtake Listrik PLN", "5. Kredit Karbon", 
+              "Risiko Pasokan (Feedstock)", "Risiko Keterlambatan EPC", "Risiko Kerusakan Mesin (MB)", "Risiko Penalti Grid", "Risiko Volatilitas Harga Karbon"
+          ],
+          color=["#0056b3", "#0056b3", "#0056b3", "#0056b3", "#0056b3", "#dc3545", "#dc3545", "#dc3545", "#dc3545", "#dc3545"]
         ),
-        link = dict(
-          source = [0, 1, 2, 3, 4], 
-          target = [5, 6, 7, 8, 9],
-          value =  [40, 25, 30, 20, 15]
-      ))])
-    fig_sankey.update_layout(title_text="Pergerakan Rantai Nilai ke Titik Risiko", font_size=12)
+        link=dict(
+          source=[0, 1, 2, 3, 4], 
+          target=[5, 6, 7, 8, 9],
+          value=[40, 25, 30, 20, 15],
+          color=["#cbd5e1", "#cbd5e1", "#cbd5e1", "#cbd5e1", "#cbd5e1"]
+        )
+    )])
+    
+    fig_sankey.update_layout(
+        title_text="Pergerakan Rantai Nilai ke Titik Risiko Utamanya",
+        font_size=12,
+        height=450,
+        margin=dict(l=20, r=20, t=40, b=20)
+    )
     st.plotly_chart(fig_sankey, use_container_width=True)
 
     st.markdown("---")
-    # Risk Heatmap Filter
     st.subheader("Matriks & Heatmap Risiko Interaktif")
     
     fase_filter = st.multiselect(
@@ -202,21 +218,18 @@ elif menu == "2. Risk Mapping Ecosystem":
 # ------------------------------------------
 elif menu == "3. FeedGuard Simulator (Parametric)":
     st.title("⚡ FeedGuard Simulator")
-    st.markdown("##### *Data-Driven Parametric Insurance Engine untuk Risiko Feedstock Sampah*[cite: 1]")
+    st.markdown("##### *Data-Driven Parametric Insurance Engine untuk Risiko Feedstock Sampah*")
     st.info("💡 **Fitur Utama:** Mensimulasikan deteksi otomatis, forecasting, dan pencairan klaim otomatis (*automatic payout trigger*) berdasarkan batas ambang pasokan harian.")
     st.markdown("---")
     
     df_feed = generate_feedstock_data()
     
-    # SECTION 1: HISTORICAL DATA & PREDICTIVE ENGINE
     st.subheader("Tahap 1 & 2: Data Historis & Forecasting Engine")
     
-    # Preset scenarios
     preset = st.selectbox("Pilih Skenario Data Pasokan:", ["Normal Operational", "Skenario Musim Hujan / Ekstrem (Februari & November)"])
     if preset == "Skenario Musim Hujan / Ekstrem (Februari & November)":
         st.warning("⚠️ Mengaktifkan efek penurunan pasokan akibat cuaca buruk dan jalan TPA terganggu.")
     
-    # Simple linear regression forecasting
     df_feed["Day_Index"] = np.arange(len(df_feed))
     X = df_feed[["Day_Index"]]
     y = df_feed["Volume_Ton"]
@@ -229,7 +242,6 @@ elif menu == "3. FeedGuard Simulator (Parametric)":
                        color_discrete_map={"Volume_Ton": "#0056b3", "Forecast_Trend": "#ff7f0e"})
     st.plotly_chart(fig_line, use_container_width=True)
     
-    # SECTION 2: PARAMETRIC TRIGGER SIMULATOR
     st.markdown("---")
     st.subheader("Tahap 3 & 4: Parametric Trigger & Backtesting Simulator")
     
@@ -247,7 +259,6 @@ elif menu == "3. FeedGuard Simulator (Parametric)":
         
         st.caption(f"📌 **Penjelasan Trigger:** Jika pasokan harian < **{trigger_val:.0f} Ton** (< {trigger_percent}%), klaim otomatis cair sebesar **Rp {payout_per_day} Juta/hari** tanpa verifikasi kerugian fisik.")
 
-    # BACKTESTING LOGIC
     df_feed["Trigger_Active"] = df_feed["Volume_Ton"] < trigger_val
     df_feed["Deficit_Ton"] = np.where(df_feed["Trigger_Active"], trigger_val - df_feed["Volume_Ton"], 0)
     df_feed["Payout_IDR"] = np.where(df_feed["Trigger_Active"], payout_per_day * 1e6, 0)
@@ -265,7 +276,6 @@ elif menu == "3. FeedGuard Simulator (Parametric)":
         m2.metric("Total Pencairan Klaim", f"Rp {actual_payout/1e9:.2f} Miliar", "Otomatis Cair")
         m3.metric("Loss Ratio FeedGuard", f"{loss_ratio:.1f}%", "Sehat" if loss_ratio < 70 else "Tinggi")
         
-        # Plot Payout Trigger Events
         df_trigger_only = df_feed[df_feed["Trigger_Active"]]
         fig_payout = px.bar(df_trigger_only, x="Tanggal", y="Payout_IDR", 
                             title="Kejadian Aktivasi Trigger Klaim Otomatis",
@@ -277,7 +287,7 @@ elif menu == "3. FeedGuard Simulator (Parametric)":
 # ------------------------------------------
 elif menu == "4. Product Architecture Modular":
     st.title("🧩 Arsitektur Produk Modular (5 Modul)")
-    st.markdown("Fleksibilitas pemilihan perlindungan berbasis kebutuhan spesifik pengembang proyek WtE.[cite: 1]")
+    st.markdown("Fleksibilitas pemilihan perlindungan berbasis kebutuhan spesifik pengembang proyek WtE.")
     st.markdown("---")
     
     st.markdown("### Pilih Kombinasi Modul Asuransi:")
@@ -328,7 +338,7 @@ elif menu == "4. Product Architecture Modular":
 # ------------------------------------------
 elif menu == "5. Business Model & Network":
     st.title("🌐 Model Bisnis & Ekosistem Kolaborasi")
-    st.markdown("Menghubungkan Tugu Insurance sebagai *Hub Utama* dalam ekosistem multi-pihak WtE.[cite: 1]")
+    st.markdown("Menghubungkan Tugu Insurance sebagai *Hub Utama* dalam ekosistem multi-pihak WtE.")
     st.markdown("---")
     
     st.subheader("Jaringan Kemitraan Tugu WtE Risk Hub")
@@ -360,10 +370,9 @@ elif menu == "5. Business Model & Network":
 # ------------------------------------------
 elif menu == "6. Financial Projection Dynamic":
     st.title("📈 Proyeksi Keuangan 3 Tahun (What-If Simulation)")
-    st.markdown("Simulasi fleksibel untuk menguji kelayakan bisnis dan potensi pendapatan Tugu Insurance.[cite: 1]")
+    st.markdown("Simulasi fleksibel untuk menguji kelayakan bisnis dan potensi pendapatan Tugu Insurance.")
     st.markdown("---")
     
-    # INTERACTIVE SCENARIOS
     st.subheader("🎛️ Asumsi Skenario Proyeksi")
     scenario = st.radio("Pilih Skenario Otomatis:", ["Conservative", "Base Case", "Optimistic"], index=1, horizontal=True)
     
@@ -375,7 +384,7 @@ elif menu == "6. Financial Projection Dynamic":
         default_proj = [3, 7, 12]
         default_avg_prem = 4.5
         default_loss_ratio = 48.0
-    else: # Optimistic
+    else: 
         default_proj = [5, 10, 18]
         default_avg_prem = 5.0
         default_loss_ratio = 40.0
@@ -388,7 +397,6 @@ elif menu == "6. Financial Projection Dynamic":
     with c3:
         opex_ratio = st.slider("Rasio Operasional & Komisi (%):", min_value=10.0, max_value=30.0, value=15.0, step=1.0)
         
-    # CALCULATIONS
     years = ["Tahun 1 (2026)", "Tahun 2 (2027)", "Tahun 3 (2028)"]
     num_projects = default_proj
     
@@ -412,7 +420,6 @@ elif menu == "6. Financial Projection Dynamic":
     st.subheader(f"📊 Ringkasan Keuangan Skenario: **{scenario}**")
     st.dataframe(fin_df, use_container_width=True)
     
-    # Financial Visualizations
     fig_fin = go.Figure()
     fig_fin.add_trace(go.Bar(x=years, y=gwp_list, name="Gross Written Premium (GWP)", marker_color="#0056b3"))
     fig_fin.add_trace(go.Bar(x=years, y=underwriting_result, name="Hasil Underwriting (Profit)", marker_color="#28a745"))
@@ -424,7 +431,7 @@ elif menu == "6. Financial Projection Dynamic":
 # ------------------------------------------
 elif menu == "7. ESG & Regulatory Compliance":
     st.title("🌱 Dampak ESG & Kepatuhan Regulasi")
-    st.markdown("Menyiapkan ekosistem WtE yang berkelanjutan dan selaras dengan regulasi nasional.[cite: 1]")
+    st.markdown("Menyiapkan ekosistem WtE yang berkelanjutan dan selaras dengan regulasi nasional.")
     st.markdown("---")
     
     col_esg1, col_esg2, col_esg3 = st.columns(3)
@@ -457,7 +464,8 @@ elif menu == "7. ESG & Regulatory Compliance":
         {"Regulasi": "Target Net Zero Emission (NZE) 2060", "Fokus": "Transisi Energi & Dekarbonisasi", "Kesesuaian Solusi Tugu": "Sesuai (Mendukung porsi EBT dalam bauran energi nasional)"}
     ])
     st.table(reg_df)
-    st.success("✅ Solusi **Tugu CircularShield 360** secara penuh mematuhi seluruh koridor hukum dan regulasi EBT di Indonesia[cite: 1].")
+    st.success("✅ Solusi **Tugu CircularShield 360** secara penuh mematuhi seluruh koridor hukum dan regulasi EBT di Indonesia.")
 
 # Footer
 st.markdown("---")
+st.caption("© 2026 Tim Khusaeni — Business Case Competition IDEANATION 2026 | Universitas Gunadarma")
